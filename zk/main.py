@@ -1,3 +1,4 @@
+from sre_constants import error
 import typer
 import sys
 import os
@@ -9,84 +10,87 @@ from typing import Optional
 from typing_extensions import Annotated
 
 
+ERROR_EMPTY_TITLE = "Error: Note title cannot be empty."
+PROMPT_TITLE = "Enter the title of the note"
+MAX_TITLE_LENGTH = 80
+INBOX_PATH = "/Users/mischa/Zettelkasten/0 Inbox"
+
 app = typer.Typer()
 
 
 @app.command()
-def new(input: Annotated[Optional[str], typer.Argument()] = None):
+def new(input: Annotated[Optional[str], typer.Argument()] = None) -> None:
     """
     Create a new note from the command line.
-    Optional argument
+    The argument is optional, and the program will prompt when no title is given.
     """
+    try:
+        note_title = get_note_title(input)
+        validate_title(note_title)
 
-    if input is None or input.strip() == "":
-        # If no input is provided or it's empty, prompt the user
-        note_title = typer.prompt("Enter the title of the note")
-    else:
-        # Use the provided input as the note title
-        note_title = input.strip()
+        file_path = format_path(note_title)
+        open_file(file_path, note_title)
 
-    validate_title(note_title)
-
-    # Ensure note_title is not empty after prompting
-    if note_title.strip() == "":
-        typer.echo("Error: Note title cannot be empty.")
+    except ValueError as e:
+        typer.echo(f"Error: {str(e)}", err=True)
         raise typer.Exit(code=1)
-    file = format_path(note_title)
+    except Exception as e:
+        typer.echo(f"An unexpected error occurred: {str(e)}", err=True)
+        raise typer.Exit(code=1)
 
-    open_file(file, note_title)
+
+def get_note_title(input: Optional[str]) -> str:
+    """Get the note title from input or prompt the user."""
+    if not input or input.strip() == "":
+        return typer.prompt("Enter the title of the note")
+    return input.strip()
 
 
-def validate_title(title: str):
-    if len(title) > 80:
-        print("Title can not be more than 80 characters.")
-        sys.exit(1)
-
+def validate_title(title: str) -> None:
+    """Validate the note title."""
+    if len(title) > MAX_TITLE_LENGTH:
+        raise ValueError(f"Title cannot be more than {MAX_TITLE_LENGTH} characters.")
     if title.endswith(".md"):
-        print("Leave out the .md extension.")
-        sys.exit(1)
+        raise ValueError("Leave out the .md extension.")
+    if not title.strip():
+        raise ValueError(ERROR_EMPTY_TITLE)
 
 
 def format_path(note_title: str) -> str:
     """
     Formats the absolute path based on Zettelkasten location and the note title.
     """
-    inbox = "/Users/mischa/Zettelkasten/0 Inbox"
     file_name = f"{note_title}.md"
-    file_path = os.path.join(inbox, file_name)
-
-    print(file_path)
-    return file_path
+    return os.path.join(INBOX_PATH, file_name)
 
 
-def open_file(file: str, note_title: str):
-    """
-    Opens the file in Neovim
-    """
-    if os.path.exists(file):
-        print("The file already exists.", file=sys.stderr)
-        sys.exit(1)
+def create_note_file(file_path: str, note_title: str):
+    with open(file_path, "w") as f:
+        f.write(f"# {note_title}\n\n")
+
+
+def open_in_neovim(file_path: str):
+    try:
+        subprocess.run(["nvim", file_path], check=True)
+    except subprocess.CalledProcessError:
+        print("Error: Failed to open the file with nvim.")
+    except FileNotFoundError:
+        print(
+            "Error: nvim command not found. Make sure it's installed and in your PATH."
+        )
+
+
+def open_file(file_path: str, note_title: str):
+    if os.path.exists(file_path):
+        raise FileExistsError(f"The file already exists: {file_path}")
 
     try:
-        with open(file, "w") as f:
-            # Add the title of the file as H1 markdown heading
-            f.write(f"# {note_title}\n\n")
-
-        print(f"New note created: {file}")
-
-        try:
-            subprocess.run(["nvim", file], check=True)
-
-        except subprocess.CalledProcessError:
-            print("Error: Failed to open the file with nvim.")
-
-        except FileNotFoundError:
-            print(
-                "Error: nvim command not found. Make sure it's installed and in your PATH."
-            )
+        create_note_file(file_path, note_title)
+        print(f"New note created: {file_path}")
+        open_in_neovim(file_path)
     except IOError as e:
         print(f"Error creating note: {e}")
-        sys.exit(1)
+        raise
 
 
 # To allow input like "- [[this is my new note]]", we need to allow extra args
