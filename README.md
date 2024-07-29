@@ -1,2 +1,3 @@
-# zettelkasten-cli
-A bespoke CLI for my Zettelkasten written in Python
+# Zettelkasten CLI
+
+A bespoke CLI for my Zettelkasten written in Python.

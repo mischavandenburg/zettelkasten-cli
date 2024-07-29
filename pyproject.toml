@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "zk"
+version= "0.0.0"
+description = ""
+authors = ["Mischa van den Burg"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = {extras = ["all"], version = "^0.12.3"}
+
+[tool.poetry.scripts]
+zk = "zk.main:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
