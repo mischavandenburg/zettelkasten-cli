@@ -1,37 +1,47 @@
-from sre_constants import error
-import typer
-import sys
 import os
 import re
-from rich import print
 import subprocess
-
 from typing import Optional
+
+import typer
+from rich import print
 from typing_extensions import Annotated
 
-
-ERROR_EMPTY_TITLE = "Error: Note title cannot be empty."
-PROMPT_TITLE = "Enter the title of the note"
+# Constants
 MAX_TITLE_LENGTH = 80
 INBOX_PATH = "/Users/mischa/Zettelkasten/0 Inbox"
+PROMPT_TITLE = "Enter the title of the note"
+
+
+# Custom Exceptions
+class EmptyTitleError(ValueError):
+    """Raised when the note title is empty."""
+
+
+class TitleTooLongError(ValueError):
+    """Raised when the note title exceeds the maximum length."""
+
+
+class FileExistsError(IOError):
+    """Raised when trying to create a file that already exists."""
+
+
+class InvalidInputError(ValueError):
+    """Raised when the input doesn't match the expected format."""
+
 
 app = typer.Typer()
 
 
 @app.command()
-def new(input: Annotated[Optional[str], typer.Argument()] = None) -> None:
-    """
-    Create a new note from the command line.
-    The argument is optional, and the program will prompt when no title is given.
-    """
+def new(title: Annotated[Optional[str], typer.Argument()] = None) -> None:
+    """Create a new note from the command line."""
     try:
-        note_title = get_note_title(input)
+        note_title = get_note_title(title)
         validate_title(note_title)
-
         file_path = format_path(note_title)
-        open_file(file_path, note_title)
-
-    except ValueError as e:
+        create_and_open_file(file_path, note_title)
+    except (EmptyTitleError, TitleTooLongError, FileExistsError) as e:
         typer.echo(f"Error: {str(e)}", err=True)
         raise typer.Exit(code=1)
     except Exception as e:
@@ -39,37 +49,36 @@ def new(input: Annotated[Optional[str], typer.Argument()] = None) -> None:
         raise typer.Exit(code=1)
 
 
-def get_note_title(input: Optional[str]) -> str:
+def get_note_title(title: Optional[str]) -> str:
     """Get the note title from input or prompt the user."""
-    if not input or input.strip() == "":
-        return typer.prompt("Enter the title of the note")
-    return input.strip()
+    return title.strip() if title else typer.prompt(PROMPT_TITLE)
 
 
 def validate_title(title: str) -> None:
     """Validate the note title."""
+    if not title:
+        raise EmptyTitleError("Note title cannot be empty.")
     if len(title) > MAX_TITLE_LENGTH:
-        raise ValueError(f"Title cannot be more than {MAX_TITLE_LENGTH} characters.")
+        raise TitleTooLongError(
+            f"Title cannot be more than {MAX_TITLE_LENGTH} characters."
+        )
     if title.endswith(".md"):
         raise ValueError("Leave out the .md extension.")
-    if not title.strip():
-        raise ValueError(ERROR_EMPTY_TITLE)
 
 
 def format_path(note_title: str) -> str:
-    """
-    Formats the absolute path based on Zettelkasten location and the note title.
-    """
-    file_name = f"{note_title}.md"
-    return os.path.join(INBOX_PATH, file_name)
+    """Format the absolute path based on Zettelkasten location and the note title."""
+    return os.path.join(INBOX_PATH, f"{note_title}.md")
 
 
-def create_note_file(file_path: str, note_title: str):
+def create_note_file(file_path: str, note_title: str) -> None:
+    """Create a new note file with the given title."""
     with open(file_path, "w") as f:
         f.write(f"# {note_title}\n\n")
 
 
-def open_in_neovim(file_path: str):
+def open_in_neovim(file_path: str) -> None:
+    """Open the created file in Neovim."""
     try:
         subprocess.run(["nvim", file_path], check=True)
     except subprocess.CalledProcessError:
@@ -80,39 +89,42 @@ def open_in_neovim(file_path: str):
         )
 
 
-def open_file(file_path: str, note_title: str):
+def create_and_open_file(file_path: str, note_title: str) -> None:
+    """Create a new note file and open it in Neovim."""
     if os.path.exists(file_path):
         raise FileExistsError(f"The file already exists: {file_path}")
 
-    try:
-        create_note_file(file_path, note_title)
-        print(f"New note created: {file_path}")
-        open_in_neovim(file_path)
-    except IOError as e:
-        print(f"Error creating note: {e}")
-        raise
+    create_note_file(file_path, note_title)
+    print(f"New note created: {file_path}")
+    open_in_neovim(file_path)
 
 
 # To allow input like "- [[this is my new note]]", we need to allow extra args
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
 )
-def new_note_from_vim(ctx: typer.Context):
-    """
-    Create new note and add link to daily note.
-    """
-    print(ctx.args)
+def new_note_from_vim(context: typer.Context) -> None:
+    """Create new note and add link to daily note."""
 
-    file_name = format_from_vim(" ".join(ctx.args))
-
+    print(context.args)
+    file_name = format_from_vim(" ".join(context.args))
     print(file_name)
 
 
-def format_from_vim(input_line) -> str:
+def format_from_vim(input_line: str) -> str:
+    """
+    Extract file name from input line (expected format: '[[file name]]').
+
+    Args:
+        input_line (str): The input string containing the file name.
+
+    Returns:
+        str: The extracted file name with '.md' extension.
+
+    Raises:
+        InvalidInputError: If no text is found between double brackets.
+    """
     match = re.search(r"\[\[(.*?)\]\]", input_line)
     if not match:
-        print("Error: No text found between double brackets", file=sys.stderr)
-        sys.exit(1)
-
-    file_name = f"{match.group(1)}.md"
-    return file_name
+        raise InvalidInputError("No text found between double brackets")
+    return f"{match.group(1)}.md"
