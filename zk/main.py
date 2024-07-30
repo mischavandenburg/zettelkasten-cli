@@ -53,8 +53,20 @@ def format_path(note_title: str) -> str:
     return os.path.join(INBOX_PATH, f"{note_title}.md")
 
 
+def create_and_open_file(file_path: str, note_title: str) -> None:
+    """Create a new note file and open it in Neovim."""
+    if os.path.exists(file_path):
+        raise FileExistsError(f"The file already exists: {file_path}")
+    create_note_file(file_path, note_title)
+    print(f"New note created: {file_path}")
+    open_in_neovim(file_path)
+
+
 def create_note_file(file_path: str, note_title: str) -> None:
-    """Create a new note file with the given title."""
+    """
+    Create a new note file with the given title and add a H1 Mardkown heading.
+    """
+    # TODO: Implement the logic to add the link to the daily note
     with open(file_path, "w") as f:
         f.write(f"# {note_title}\n\n")
 
@@ -69,15 +81,6 @@ def open_in_neovim(file_path: str) -> None:
         print(
             "Error: nvim command not found. Make sure it's installed and in your PATH."
         )
-
-
-def create_and_open_file(file_path: str, note_title: str) -> None:
-    """Create a new note file and open it in Neovim."""
-    if os.path.exists(file_path):
-        raise FileExistsError(f"The file already exists: {file_path}")
-    create_note_file(file_path, note_title)
-    print(f"New note created: {file_path}")
-    open_in_neovim(file_path)
 
 
 @app.command(
