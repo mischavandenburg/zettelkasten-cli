@@ -60,6 +60,7 @@ def create_note_file(file_path: Path, note_title: str) -> None:
     """
     Create a new note file with the given title and add a H1 Markdown heading.
     """
+    # TODO: Implement the logic to add the link from the daily note
     file_path.write_text(f"# {note_title}\n\n")
 
 
@@ -67,10 +68,10 @@ def create_note_file(file_path: Path, note_title: str) -> None:
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
 )
 def new_note_from_vim(context: typer.Context) -> None:
-    """Create new note and add link to daily note."""
+    """Takes line from vim when sent with !! and creates it"""
     try:
         file_name = format_from_vim(" ".join(context.args))
         print(file_name)
-        # TODO: Implement the logic to add the link to the daily note
+        # TODO: Implement the logic to add the link from the daily note
     except ValueError as e:
         print(f"Error: {str(e)}")
