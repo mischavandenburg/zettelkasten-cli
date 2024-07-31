@@ -1,52 +1,52 @@
 import typer
 from rich import print
-from datetime import datetime, timedelta
-from pathlib import Path
-import os
 import subprocess
+from zk.utils import format_date
+from zk.config import ZETTELKASTEN_ROOT
 
 app = typer.Typer()
 
-# Assuming ZETTELKASTEN is an environment variable, we'll get it like this:
-ZETTELKASTEN = Path(os.environ.get("ZETTELKASTEN", ""))
-DAILY_NOTES_PATH = ZETTELKASTEN / "periodic-notes" / "daily-notes"
+TODAY = format_date()
+YESTERDAY = format_date(-1)
+TOMORROW = format_date(1)
+
+DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
+TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 
 
-def get_date_string(delta_days=0):
-    return (datetime.now() + timedelta(days=delta_days)).strftime("%Y-%m-%d")
-
-
-def format_daily_note(file_path, yesterday, tomorrow):
+def create_daily_note(file_path):
     """Sets up the daily note template."""
 
     # TODO: set up template in separate file
     content = f"""
-[[{yesterday}]] - [[{tomorrow}]]
-## Habits
-- [ ] Calorie logging
+[[{YESTERDAY}]] - [[{TOMORROW}]]
+
+## Daily Deeds
+
+- [ ] Track calories
 - [ ] Yoga
 - [ ] Exercise
-## Log
+- [ ] Check Weekly Note for Intentions
+
+## Journal
 """
     file_path.write_text(content)
 
 
+def append_daily_note(note_title):
+    """Append given note title to daily note as Obsidian markdown link."""
+    with TODAY_NOTE_PATH.open(mode="a") as note:
+        note.write(f"\n[[{note_title}]]")
+
+
 def open_daily_note():
     """Create or open today's daily note."""
-    today = get_date_string()
-    yesterday = get_date_string(-1)
-    tomorrow = get_date_string(1)
 
-    file_path = DAILY_NOTES_PATH / f"{today}.md"
-
-    if not file_path.exists():
-        print(f"File does not exist, creating new daily note: {file_path}")
-        format_daily_note(file_path, yesterday, tomorrow)
+    if not TODAY_NOTE_PATH.exists():
+        print(f"File does not exist, creating new daily note: {TODAY_NOTE_PATH}")
+        create_daily_note(TODAY_NOTE_PATH)
     else:
-        print(f"Opening existing daily note: {file_path}")
-
-    # Change to the ZETTELKASTEN directory
-    os.chdir(ZETTELKASTEN)
+        print(f"Opening existing daily note: {TODAY_NOTE_PATH}")
 
     # Open the file in Neovim at the bottom in insert mode and run NoNeckPain
-    subprocess.run(["nvim", "+ normal Gzzo", str(file_path), "-c", ":NoNeckPain"])
+    subprocess.run(["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":NoNeckPain"])

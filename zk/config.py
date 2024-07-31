@@ -1,7 +1,8 @@
 from pathlib import Path
+import os
 
 # Paths
-ZETTELKASTEN_ROOT = Path("/Users/mischa/Zettelkasten")
+ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
 INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
 
 # File settings

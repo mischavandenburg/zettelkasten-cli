@@ -2,6 +2,11 @@ import re
 import subprocess
 from rich import print
 from zk.config import EDITOR_COMMAND
+from datetime import datetime, timedelta
+
+
+def format_date(delta_days=0):
+    return (datetime.now() + timedelta(days=delta_days)).strftime("%Y-%m-%d")
 
 
 def open_in_editor(file_path: str) -> None:

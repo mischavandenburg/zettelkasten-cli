@@ -4,7 +4,7 @@ from typing import Optional
 from pathlib import Path
 from zk.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
 from zk.utils import open_in_editor, format_from_vim
-
+from zk.daily_note import append_daily_note
 
 app = typer.Typer()
 
@@ -60,7 +60,7 @@ def create_note_file(file_path: Path, note_title: str) -> None:
     """
     Create a new note file with the given title and add a H1 Markdown heading.
     """
-    # TODO: Implement the logic to add the link from the daily note
+    append_daily_note(note_title)
     file_path.write_text(f"# {note_title}\n\n")
 
 
