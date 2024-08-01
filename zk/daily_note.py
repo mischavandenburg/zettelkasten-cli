@@ -13,6 +13,8 @@ TOMORROW = format_date(1)
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 
+# TODO: Add type hints
+
 
 def create_daily_note(file_path):
     """Sets up the daily note template."""
