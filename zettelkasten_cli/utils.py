@@ -1,7 +1,7 @@
 import re
 import subprocess
 from rich import print
-from zk.config import EDITOR_COMMAND
+from zettelkasten_cli.config import EDITOR_COMMAND
 from datetime import datetime, timedelta
 
 

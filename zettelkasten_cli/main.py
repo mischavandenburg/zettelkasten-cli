@@ -1,7 +1,7 @@
 import typer
 
-from zk import new_note
-from zk import daily_note
+from zettelkasten_cli import new_note
+from zettelkasten_cli import daily_note
 
 from typing import Optional
 from typing_extensions import Annotated

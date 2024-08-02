@@ -1,8 +1,8 @@
 import typer
 from rich import print
 import subprocess
-from zk.utils import format_date
-from zk.config import ZETTELKASTEN_ROOT
+from zettelkasten_cli.utils import format_date
+from zettelkasten_cli.config import ZETTELKASTEN_ROOT
 
 app = typer.Typer()
 

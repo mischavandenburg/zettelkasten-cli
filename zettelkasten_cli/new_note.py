@@ -2,9 +2,9 @@ import typer
 from rich import print
 from typing import Optional
 from pathlib import Path
-from zk.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
-from zk.utils import open_in_editor, format_from_vim
-from zk.daily_note import append_daily_note
+from zettelkasten_cli.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
+from zettelkasten_cli.utils import open_in_editor, format_from_vim
+from zettelkasten_cli.daily_note import append_daily_note
 
 app = typer.Typer()
 
