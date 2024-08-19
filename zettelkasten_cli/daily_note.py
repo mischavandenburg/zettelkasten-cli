@@ -20,6 +20,7 @@ def create_daily_note(file_path):
     """Sets up the daily note template."""
 
     # TODO: set up template in separate file
+    #
     content = f"""
 [[{YESTERDAY}]] - [[{TOMORROW}]]
 
@@ -37,6 +38,9 @@ def create_daily_note(file_path):
 
 def append_daily_note(note_title):
     """Append given note title to daily note as Obsidian markdown link."""
+
+    # TODO: add check if the daily note exists, and create it if it doesn't
+
     with TODAY_NOTE_PATH.open(mode="a") as note:
         note.write(f"\n[[{note_title}]]")
 

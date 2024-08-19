@@ -58,7 +58,7 @@ def create_and_open_file(file_path: Path, note_title: str) -> None:
 
 def create_note_file(file_path: Path, note_title: str) -> None:
     """
-    Create a new note file with the given title and add a H1 Markdown heading.
+    Create a new note file with the given title, append the title tot he daily note, and add a H1 Markdown heading.
     """
     append_daily_note(note_title)
     file_path.write_text(f"# {note_title}\n\n")
