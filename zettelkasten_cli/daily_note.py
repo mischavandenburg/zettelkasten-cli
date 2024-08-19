@@ -9,19 +9,19 @@ app = typer.Typer()
 TODAY = format_date()
 YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
-
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 
-# TODO: Add type hints
 
+def format_daily_note_content() -> str:
+    """
+    Creates the daily note template content.
 
-def create_daily_note(file_path):
-    """Sets up the daily note template."""
-
-    # TODO: set up template in separate file
-    #
-    content = f"""
+    Returns:
+        str: Formatted content for the daily note.
+    """
+    # TODO: Consider moving this template to a separate config file
+    return f"""
 [[{YESTERDAY}]] - [[{TOMORROW}]]
 
 ## Daily Deeds
@@ -32,27 +32,50 @@ def create_daily_note(file_path):
 - [ ] Check Weekly Note for Intentions
 
 ## Journal
+
 """
-    file_path.write_text(content)
 
 
-def append_daily_note(note_title):
-    """Append given note title to daily note as Obsidian markdown link."""
+def create_daily_note() -> None:
+    """
+    Creates the daily note if it doesn't exist.
+    If the note already exists, it prints a message indicating so.
+    """
+    try:
+        if not TODAY_NOTE_PATH.exists():
+            print(f"Creating new daily note: {TODAY_NOTE_PATH}")
+            TODAY_NOTE_PATH.write_text(format_daily_note_content())
+        else:
+            print(f"Daily note already exists: {TODAY_NOTE_PATH}")
+    except IOError as e:
+        print(f"Error creating daily note: {e}")
 
-    # TODO: add check if the daily note exists, and create it if it doesn't
 
-    with TODAY_NOTE_PATH.open(mode="a") as note:
-        note.write(f"\n[[{note_title}]]")
+def append_daily_note(note_title: str) -> None:
+    """
+    Appends given note title to daily note as Obsidian markdown link.
+
+    Args:
+        note_title (str): The title of the note to be appended.
+    """
+    create_daily_note()
+    try:
+        with TODAY_NOTE_PATH.open(mode="a") as note:
+            note.write(f"\n[[{note_title}]]")
+    except IOError as e:
+        print(f"Error appending to daily note: {e}")
 
 
-def open_daily_note():
-    """Create or open today's daily note."""
-
-    if not TODAY_NOTE_PATH.exists():
-        print(f"File does not exist, creating new daily note: {TODAY_NOTE_PATH}")
-        create_daily_note(TODAY_NOTE_PATH)
-    else:
-        print(f"Opening existing daily note: {TODAY_NOTE_PATH}")
-
-    # Open the file in Neovim at the bottom in insert mode and run NoNeckPain
-    subprocess.run(["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":NoNeckPain"])
+def open_daily_note() -> None:
+    """
+    Opens today's daily note in Neovim.
+    Creates the note if it doesn't exist before opening.
+    """
+    create_daily_note()
+    try:
+        subprocess.run(
+            ["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":NoNeckPain"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error opening daily note in Neovim: {e}")
