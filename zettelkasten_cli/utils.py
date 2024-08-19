@@ -1,4 +1,3 @@
-import re
 import subprocess
 from rich import print
 from zettelkasten_cli.config import EDITOR_COMMAND
@@ -19,13 +18,3 @@ def open_in_editor(file_path: str) -> None:
         print(
             f"Error: {EDITOR_COMMAND} command not found. Make sure it's installed and in your PATH."
         )
-
-
-def format_from_vim(input_line: str) -> str:
-    """
-    Extract file name from input line (expected format: '[[file name]]').
-    """
-    match = re.search(r"\[\[(.*?)\]\]", input_line)
-    if not match:
-        raise ValueError("No text found between double brackets")
-    return f"{match.group(1)}.md"

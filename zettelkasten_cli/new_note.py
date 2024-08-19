@@ -62,17 +62,3 @@ def create_note_file(file_path: Path, note_title: str) -> None:
     """
     append_daily_note(note_title)
     file_path.write_text(f"# {note_title}\n\n")
-
-
-@app.command(
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
-)
-def new_note_from_vim(context: typer.Context) -> None:
-    """Takes line from vim when sent with !! and creates it"""
-    # TODO: Implement --vim option to pass text from vim with "- [[test]]" formatting
-    try:
-        file_name = format_from_vim(" ".join(context.args))
-        print(file_name)
-        # TODO: Implement the logic to add the link from the daily note
-    except ValueError as e:
-        print(f"Error: {str(e)}")
