@@ -3,7 +3,7 @@ from rich import print
 from typing import Optional
 from pathlib import Path
 from zettelkasten_cli.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
-from zettelkasten_cli.utils import open_in_editor, format_from_vim
+from zettelkasten_cli.utils import open_in_editor
 from zettelkasten_cli.daily_note import append_daily_note
 
 app = typer.Typer()

@@ -71,6 +71,8 @@ def open_daily_note() -> None:
     Opens today's daily note in Neovim.
     Creates the note if it doesn't exist before opening.
     """
+
+    # TODO: use the function from utils
     create_daily_note()
     try:
         subprocess.run(

@@ -22,8 +22,3 @@ def new(title: Annotated[Optional[str], typer.Argument()] = None) -> None:
 def day():
     """Open daily note or create if it doesn't exist."""
     daily_note.open_daily_note()
-
-
-# if __name__ == "__main__":
-#     app()
-#
