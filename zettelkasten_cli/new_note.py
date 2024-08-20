@@ -9,13 +9,15 @@ from zettelkasten_cli.daily_note import append_daily_note
 app = typer.Typer()
 
 
-def create_new_note(title) -> None:
+def create_new_note(title, vim_mode) -> None:
     """Create a new note from the command line."""
     try:
         note_title = get_note_title(title)
         validate_title(note_title)
         file_path = format_path(note_title)
-        create_and_open_file(file_path, note_title)
+        create_file(file_path, note_title)
+        if not vim_mode:
+            open_in_editor(str(file_path))
     except ValueError as e:
         typer.echo(f"Error: {str(e)}", err=True)
         raise typer.Exit(code=1)
@@ -47,13 +49,12 @@ def format_path(note_title: str) -> Path:
     return INBOX_PATH / f"{note_title}.md"
 
 
-def create_and_open_file(file_path: Path, note_title: str) -> None:
+def create_file(file_path: Path, note_title: str) -> None:
     """Create a new note file and open it in the editor."""
     if file_path.exists():
         raise FileExistsError(f"The file already exists: {file_path}")
     create_note_file(file_path, note_title)
     print(f"New note created: {file_path}")
-    open_in_editor(str(file_path))
 
 
 def create_note_file(file_path: Path, note_title: str) -> None:
