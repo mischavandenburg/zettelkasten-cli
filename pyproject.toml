@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zettelkasten-cli"
-version = "0.0.1"
+version = "0.1.0"
 description = "CLI to merge Vim and Obsidian Zettelkasten"
 authors = ["Mischa van den Burg"]
 readme = "README.md"
