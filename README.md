@@ -50,4 +50,5 @@ new [OPTIONS] [TITLE]
 
 **Options**:
 
+- `--vim`: Indicates input is coming from vim. Prevents new file being opened.
 - `--help`: Show this message and exit.
