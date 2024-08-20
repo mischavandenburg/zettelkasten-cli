@@ -16,3 +16,4 @@ jobs:
           PACKAGE_DIRECTORY: "./zettelkasten_cli/"
           PYTHON_VERSION: "3.12"
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_REGISTRY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
