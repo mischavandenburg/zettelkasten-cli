@@ -13,5 +13,5 @@ jobs:
       - name: Publish PyPi package
         uses: cadifyai/poetry-publish@v0.1.0
         with:
-          PACKAGE_DIRECTORY: "./zettelkasten-cli/"
+          PACKAGE_DIRECTORY: "./zettelkasten_cli/"
           PYTHON_VERSION: "3.12"
