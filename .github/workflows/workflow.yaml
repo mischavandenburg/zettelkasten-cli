@@ -10,8 +10,18 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Display directory structure
+        run: ls -lathr
+
+      - name: Display directory structure
+        run: tree
+
       - name: Publish PyPi package
         uses: cadifyai/poetry-publish@v0.1.0
         with:
           PACKAGE_DIRECTORY: "./zettelkasten_cli/"
           PYTHON_VERSION: "3.12"
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
