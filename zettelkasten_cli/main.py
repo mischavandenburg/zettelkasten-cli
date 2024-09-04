@@ -1,7 +1,7 @@
 import typer
 
 from zettelkasten_cli import new_note
-from zettelkasten_cli import daily_note
+from zettelkasten_cli import periodic_notes
 
 from typing import Optional
 from typing_extensions import Annotated
@@ -24,4 +24,10 @@ def new(
 @app.command()
 def day():
     """Open daily note or create if it doesn't exist."""
-    daily_note.open_daily_note()
+    periodic_notes.open_daily_note()
+
+
+@app.command()
+def week():
+    """Open weekly note or throw error if it doesn't exist."""
+    periodic_notes.open_weekly_note()

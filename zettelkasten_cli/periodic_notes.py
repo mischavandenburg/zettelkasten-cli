@@ -3,6 +3,8 @@ from rich import print
 import subprocess
 from zettelkasten_cli.utils import format_date
 from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from datetime import datetime
+from pathlib import Path
 
 app = typer.Typer()
 
@@ -11,6 +13,7 @@ YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
+WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly-notes"
 
 
 def format_daily_note_content() -> str:
@@ -81,3 +84,37 @@ def open_daily_note() -> None:
         )
     except subprocess.CalledProcessError as e:
         print(f"Error opening daily note in Neovim: {e}")
+
+
+def get_weekly_note_path() -> Path:
+    """
+    Formats the note title.
+    Returns the path to the current week's note.
+    """
+    week_number = datetime.now().strftime("%Y-W%W")
+    return WEEKLY_NOTES_PATH / f"{week_number}.md"
+
+    # TODO: use the function from utils
+
+
+@app.command()
+def open_weekly_note():
+    """
+    Opens this week's weekly note in Neovim if it exists.
+    If the note doesn't exist, it prints an error message.
+    """
+    weekly_note_path = get_weekly_note_path()
+
+    if not weekly_note_path.exists():
+        print(
+            "[bold red]Error:[/bold red] Weekly note doesn't exist. Please create it in Obsidian."
+        )
+        return
+
+    try:
+        subprocess.run(
+            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":NoNeckPain"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error opening weekly note in Neovim: {e}")

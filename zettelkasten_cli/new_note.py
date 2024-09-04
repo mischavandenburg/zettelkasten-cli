@@ -4,7 +4,7 @@ from typing import Optional
 from pathlib import Path
 from zettelkasten_cli.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
 from zettelkasten_cli.utils import open_in_editor
-from zettelkasten_cli.daily_note import append_daily_note
+from zettelkasten_cli.periodic_notes import append_daily_note
 
 app = typer.Typer()
 
