@@ -9,6 +9,8 @@ from zettelkasten_cli.periodic_notes import append_daily_note
 app = typer.Typer()
 
 
+# TODO: Add H1 title to new note
+
 def create_new_note(title, vim_mode) -> None:
     """Create a new note from the command line."""
     try:
