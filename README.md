@@ -52,3 +52,9 @@ new [OPTIONS] [TITLE]
 
 - `--vim`: Indicates input is coming from vim. Prevents new file being opened.
 - `--help`: Show this message and exit.
+
+## Creating a Release
+
+Push the changes to the repo and create a release with a new tag from the GitHub CLI or from the UI.
+
+The GH Actions workflow handles the rest. It auto-updates the pyproject.toml and pushes to PyPi.
