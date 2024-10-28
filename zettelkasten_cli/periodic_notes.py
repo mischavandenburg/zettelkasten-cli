@@ -1,6 +1,7 @@
 import typer
 from rich import print
 import subprocess
+import os
 from zettelkasten_cli.utils import format_date
 from zettelkasten_cli.config import ZETTELKASTEN_ROOT
 from datetime import datetime
@@ -11,32 +12,42 @@ app = typer.Typer()
 TODAY = format_date()
 YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
+CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
+DAILY_NOTES_TEMPLATE_PATH = CONFIG_PATH / "zk" / "daily.md"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly-notes"
 
 
 def format_daily_note_content() -> str:
     """
-    Creates the daily note template content.
-
+    Creates the daily note template content by reading from the template file.
     Returns:
         str: Formatted content for the daily note.
     """
-    # TODO: Consider moving this template to a separate config file
-    return f"""
-[[{YESTERDAY}]] - [[{TOMORROW}]]
+    # Add the navigation links at the top
+    content = f"[[{YESTERDAY}]] - [[{TOMORROW}]]\n\n"
 
-## Daily Deeds
-
-- [ ] Track calories
-- [ ] Yoga
-- [ ] Exercise
-- [ ] Check Weekly Note for Intentions
-
+    # Read and append the template content if it exists
+    try:
+        if DAILY_NOTES_TEMPLATE_PATH.exists():
+            template_content = DAILY_NOTES_TEMPLATE_PATH.read_text()
+            content += template_content
+        else:
+            print(f"Warning: Template file not found at {DAILY_NOTES_TEMPLATE_PATH}")
+            # Fallback to default template
+            content += """
 ## Journal
 
 """
+    except IOError as e:
+        print(f"Error reading template file: {e}")
+        # Fallback to default template
+        content += """
+## Journal
+"""
+
+    return content
 
 
 def create_daily_note() -> None:
@@ -57,7 +68,6 @@ def create_daily_note() -> None:
 def append_daily_note(note_title: str) -> None:
     """
     Appends given note title to daily note as Obsidian markdown link.
-
     Args:
         note_title (str): The title of the note to be appended.
     """
@@ -74,7 +84,6 @@ def open_daily_note() -> None:
     Opens today's daily note in Neovim.
     Creates the note if it doesn't exist before opening.
     """
-
     # TODO: use the function from utils
     create_daily_note()
     try:
@@ -93,7 +102,6 @@ def get_weekly_note_path() -> Path:
     """
     week_number = datetime.now().strftime("%Y-W%W")
     return WEEKLY_NOTES_PATH / f"{week_number}.md"
-
     # TODO: use the function from utils
 
 
@@ -104,13 +112,11 @@ def open_weekly_note():
     If the note doesn't exist, it prints an error message.
     """
     weekly_note_path = get_weekly_note_path()
-
     if not weekly_note_path.exists():
         print(
             "[bold red]Error:[/bold red] Weekly note doesn't exist. Please create it in Obsidian."
         )
         return
-
     try:
         subprocess.run(
             ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":NoNeckPain"],
