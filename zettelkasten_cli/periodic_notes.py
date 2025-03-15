@@ -177,10 +177,11 @@ def open_weekly_note() -> None:
     Opens this week's weekly note in Neovim.
     If the note doesn't exist, it prints an error message.
     """
+    weekly_note_path = get_weekly_note_path()
     create_weekly_note()
     try:
         subprocess.run(
-            ["nvim", "+ normal Gzzo", str(WEEKLY_NOTES_PATH), "-c", ":ZenMode"],
+            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":ZenMode"],
             check=True,
         )
     except subprocess.CalledProcessError as e:
