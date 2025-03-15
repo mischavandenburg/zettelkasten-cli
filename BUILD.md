@@ -12,6 +12,8 @@ zk = "zettelkasten_cli.main:app"
 
 4. Next, `pipx install dist/zettelkasten_cli-0.1.0-py3-none-any.whl`
 
-5. Finally, create a symlink to the `zk` command in your path: `ln -s ~/.local/share/pipx/venvs/zettelkasten-cli/bin/zk ~/.local/bin/`
+5. If it doesn't exist, create a symlink to the `zk` command in your path: `ln -s ~/.local/share/pipx/venvs/zettelkasten-cli/bin/zk ~/.local/bin/`
+
+6. Add `export ZETTELKASTEN=<path to directory>` to your shell profile
 
 Run `zk` to get started.

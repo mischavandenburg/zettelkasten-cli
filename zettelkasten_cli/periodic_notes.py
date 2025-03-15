@@ -1,11 +1,13 @@
-import typer
-from rich import print
-import subprocess
 import os
-from zettelkasten_cli.utils import format_date, format_week
-from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+import subprocess
 from datetime import datetime
 from pathlib import Path
+
+import typer
+from rich import print
+
+from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from zettelkasten_cli.utils import format_date, format_week
 
 app = typer.Typer()
 
@@ -14,12 +16,14 @@ YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
 LAST_WEEK = format_week(-7)  # Correct this to start on Monday and end Sunday
 NEXT_WEEK = format_week(7)  # Correct this to start on Monday and end Sunday
-# CONFIG_PATH = Path(os.environ.get("", ""))
+CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
+
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "_Daily"
 DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "daily.md"
-WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "weekly.md"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
+
 WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "_Weekly"
+WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "weekly.md"
 
 
 def format_daily_note_content() -> str:
@@ -61,6 +65,7 @@ def format_weekly_note_content() -> str:
     """
     # Read and append the template content if it exists
     content = f"[[{LAST_WEEK}]] - [[{NEXT_WEEK}]]\n\n"
+
     try:
         if WEEKLY_NOTES_TEMPLATE_PATH.exists():
             template_content = WEEKLY_NOTES_TEMPLATE_PATH.read_text()
@@ -78,7 +83,7 @@ def format_weekly_note_content() -> str:
         content += """
 ### Weekly Journal
 """
-        return content
+    return content
 
 
 def create_daily_note() -> None:
@@ -141,10 +146,12 @@ def create_weekly_note() -> None:
     Creates the weekly note if it doesn't exist.
     """
     # TODO: use the function from utils
+    weekly_note_path = get_weekly_note_path()
     try:
-        if not WEEKLY_NOTES_PATH.exists():
+        if not weekly_note_path.exists():
             print(f"Creating new weekly note: {WEEKLY_NOTES_PATH}")
-            WEEKLY_NOTES_PATH.write_text(format_weekly_note_content())
+            weekly_note_content = format_weekly_note_content()
+            weekly_note_path.write_text(weekly_note_content)
         else:
             print(f"Weekly note already exists: {WEEKLY_NOTES_PATH}")
     except IOError as e:
@@ -170,15 +177,10 @@ def open_weekly_note() -> None:
     Opens this week's weekly note in Neovim.
     If the note doesn't exist, it prints an error message.
     """
-    weekly_note_path = get_weekly_note_path()
-    if not weekly_note_path.exists():
-        print(
-            "[bold red]Error:[/bold red] Weekly note doesn't exist. Please create it in Obsidian."
-        )
-        return
+    create_weekly_note()
     try:
         subprocess.run(
-            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":NoNeckPain"],
+            ["nvim", "+ normal Gzzo", str(WEEKLY_NOTES_PATH), "-c", ":ZenMode"],
             check=True,
         )
     except subprocess.CalledProcessError as e:

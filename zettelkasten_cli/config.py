@@ -1,8 +1,8 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Paths
-ZETTELKASTEN_ROOT = Path(os.environ.get("~/Documents/Obsidian_Vault", ""))
+ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
 INBOX_PATH = ZETTELKASTEN_ROOT / "1_Fleeting_Notes"
 
 # File settings
