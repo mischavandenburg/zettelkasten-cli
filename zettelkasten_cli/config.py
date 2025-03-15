@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Paths
 ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
-INBOX_PATH = ZETTELKASTEN_ROOT / "1_Fleeting_Notes"
+INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
 
 # File settings
 MAX_TITLE_LENGTH = 80

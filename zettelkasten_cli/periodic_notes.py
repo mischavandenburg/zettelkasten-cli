@@ -18,12 +18,12 @@ LAST_WEEK = format_week(-7)  # Correct this to start on Monday and end Sunday
 NEXT_WEEK = format_week(7)  # Correct this to start on Monday and end Sunday
 CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
 
-DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "_Daily"
-DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "daily.md"
+DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily"
+DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "daily.md"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 
-WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "_Weekly"
-WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "weekly.md"
+WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly"
+WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "weekly.md"
 
 
 def format_daily_note_content() -> str:
