@@ -58,3 +58,24 @@ new [OPTIONS] [TITLE]
 Push the changes to the repo and create a release with a new tag from the GitHub CLI or from the UI.
 
 The GH Actions workflow handles the rest. It auto-updates the pyproject.toml and pushes to PyPi.
+
+# Installing
+
+1. Make sure the `pyproject.toml` is present in the root directory.
+2. Add if not present:
+
+```toml
+[tool.poetry.scripts]
+zk = "zettelkasten_cli.main:app"
+```
+
+3. Run `poetry build`. This will create the wheel file in the `dist/` directory.
+4. Next, `pipx install dist/zettelkasten_cli-0.1.0-py3-none-any.whl`
+5. If it doesn't exist, create a symlink to the `zk` command in your path: `ln -s ~/.local/share/pipx/venvs/zettelkasten-cli/bin/zk ~/.local/bin/`
+6. Add `export ZETTELKASTEN=<path to directory>` to your shell profile
+
+Run `zk` to get started.
+
+== OR ==
+
+Simply run `poetry install && poetry run zk`
