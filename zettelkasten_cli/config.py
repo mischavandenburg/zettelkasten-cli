@@ -2,8 +2,8 @@ from pathlib import Path
 import os
 
 # Paths
-ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
-INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
+ZETTELKASTEN_ROOT = Path(os.environ.get("~/Documents/Obsidian_Vault", ""))
+INBOX_PATH = ZETTELKASTEN_ROOT / "1_Fleeting_Notes"
 
 # File settings
 MAX_TITLE_LENGTH = 80
