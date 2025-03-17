@@ -124,7 +124,7 @@ def open_daily_note() -> None:
     create_daily_note()
     try:
         subprocess.run(
-            ["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":ZenMode"],
+            ["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":NoNeckPain"],
             check=True,
         )
     except subprocess.CalledProcessError as e:
@@ -181,7 +181,7 @@ def open_weekly_note() -> None:
     create_weekly_note()
     try:
         subprocess.run(
-            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":ZenMode"],
+            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":NoNeckPain"],
             check=True,
         )
     except subprocess.CalledProcessError as e:
