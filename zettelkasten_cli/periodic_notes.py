@@ -7,7 +7,7 @@ import typer
 from rich import print
 
 from zettelkasten_cli.config import ZETTELKASTEN_ROOT
-from zettelkasten_cli.utils import format_date, format_week
+from zettelkasten_cli.utils import format_date, format_week, open_in_editor
 
 app = typer.Typer()
 
@@ -120,15 +120,11 @@ def open_daily_note() -> None:
     Opens today's daily note in Neovim.
     Creates the note if it doesn't exist before opening.
     """
-    # TODO: use the function from utils
     create_daily_note()
     try:
-        subprocess.run(
-            ["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":ZenMode"],
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        print(f"Error opening daily note in Neovim: {e}")
+        open_in_editor(TODAY_NOTE_PATH)
+    except Exception as e:
+        print(f"Error opening daily note: {e}")
 
 
 def get_weekly_note_path() -> Path:
@@ -180,9 +176,6 @@ def open_weekly_note() -> None:
     weekly_note_path = get_weekly_note_path()
     create_weekly_note()
     try:
-        subprocess.run(
-            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":ZenMode"],
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        print(f"Error opening weekly note in Neovim: {e}")
+        open_in_editor(weekly_note_path)
+    except Exception as e:
+        print(f"Error opening weekly note: {e}")
