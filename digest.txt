@@ -1,0 +1,475 @@
+Directory structure:
+└── zettelkasten-cli/
+    ├── README.md
+    ├── pyproject.toml
+    ├── .pre-commit-config.yaml
+    ├── scripts/
+    │   └── setup
+    ├── tests/
+    │   └── __init__.py
+    ├── zettelkasten_cli/
+    │   ├── __init__.py
+    │   ├── config.py
+    │   ├── main.py
+    │   ├── new_note.py
+    │   ├── periodic_notes.py
+    │   └── utils.py
+    ├── .devcontainer/
+    │   ├── Dockerfile
+    │   └── devcontainer.json
+    └── .github/
+        └── workflows/
+            └── workflow.yaml
+
+================================================
+File: README.md
+================================================
+# Zettelkasten CLI
+
+A bespoke CLI for my Neovim + Obsidian Zettelkasten written in Python.
+
+**Usage**:
+
+```console
+[OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+- `--install-completion`: Install completion for the current shell.
+- `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
+- `--help`: Show this message and exit.
+
+**Commands**:
+
+- `day`: Open daily note or create if it doesn't...
+- `new`: Create a new note with the provided title.
+
+## `day`
+
+Open daily note or create if it doesn't exist.
+
+**Usage**:
+
+```console
+day [OPTIONS]
+```
+
+**Options**:
+
+- `--help`: Show this message and exit.
+
+## `new`
+
+Create a new note with the provided title. Will prompt if no title given.
+Adds Obsidian markdown link to the daily note.
+
+**Usage**:
+
+```console
+new [OPTIONS] [TITLE]
+```
+
+**Arguments**:
+
+- `[TITLE]`
+
+**Options**:
+
+- `--vim`: Indicates input is coming from vim. Prevents new file being opened.
+- `--help`: Show this message and exit.
+
+## Creating a Release
+
+Push the changes to the repo and create a release with a new tag from the GitHub CLI or from the UI.
+
+The GH Actions workflow handles the rest. It auto-updates the pyproject.toml and pushes to PyPi.
+
+
+================================================
+File: pyproject.toml
+================================================
+[tool.poetry]
+name = "zettelkasten-cli"
+version = "0.2.0"
+description = "CLI to merge Vim and Obsidian Zettelkasten"
+authors = ["Mischa van den Burg"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = {extras = ["all"], version = "^0.12.3"}
+
+[tool.poetry.scripts]
+zk = "zettelkasten_cli.main:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+================================================
+File: .pre-commit-config.yaml
+================================================
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.5.5
+    hooks:
+      # Run the linter.
+      - id: ruff
+      # Run the formatter.
+      - id: ruff-format
+
+
+================================================
+File: scripts/setup
+================================================
+#!/bin/bash
+
+# /usr/local/bin/mise trust /workspaces/zettelkasten-cli/mise.toml && /usr/local/bin/mise install
+
+
+================================================
+File: zettelkasten_cli/__init__.py
+================================================
+__version__ = "0.2.0"
+
+
+================================================
+File: zettelkasten_cli/config.py
+================================================
+from pathlib import Path
+import os
+
+# Paths
+ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
+INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
+
+# File settings
+MAX_TITLE_LENGTH = 80
+
+# Prompts
+PROMPT_TITLE = "Enter the title of the note"
+
+# Commands
+EDITOR_COMMAND = "nvim"
+
+
+================================================
+File: zettelkasten_cli/main.py
+================================================
+import typer
+
+from zettelkasten_cli import new_note
+from zettelkasten_cli import periodic_notes
+
+from typing import Optional
+from typing_extensions import Annotated
+
+
+app = typer.Typer()
+
+
+@app.command()
+def new(
+    title: Annotated[Optional[str], typer.Argument()] = None,
+    vim_mode: Annotated[bool, typer.Option("--vim")] = False,
+) -> None:
+    """Create a new note with the provided title. Will prompt if no title given.
+    Adds Obsidian markdown link to the daily note.
+    """
+    new_note.create_new_note(title, vim_mode)
+
+
+@app.command()
+def day():
+    """Open daily note or create if it doesn't exist."""
+    periodic_notes.open_daily_note()
+
+
+@app.command()
+def week():
+    """Open weekly note or throw error if it doesn't exist."""
+    periodic_notes.open_weekly_note()
+
+
+================================================
+File: zettelkasten_cli/new_note.py
+================================================
+import typer
+from rich import print
+from typing import Optional
+from pathlib import Path
+from zettelkasten_cli.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
+from zettelkasten_cli.utils import open_in_editor
+from zettelkasten_cli.periodic_notes import append_daily_note
+
+app = typer.Typer()
+
+
+# TODO: Add H1 title to new note
+
+def create_new_note(title, vim_mode) -> None:
+    """Create a new note from the command line."""
+    try:
+        note_title = get_note_title(title)
+        validate_title(note_title)
+        file_path = format_path(note_title)
+        create_file(file_path, note_title)
+        if not vim_mode:
+            open_in_editor(str(file_path))
+    except ValueError as e:
+        typer.echo(f"Error: {str(e)}", err=True)
+        raise typer.Exit(code=1)
+    except FileExistsError as e:
+        typer.echo(f"Error: {str(e)}", err=True)
+        raise typer.Exit(code=1)
+    except Exception as e:
+        typer.echo(f"An unexpected error occurred: {str(e)}", err=True)
+        raise typer.Exit(code=1)
+
+
+def get_note_title(title: Optional[str]) -> str:
+    """Get the note title from input or prompt the user."""
+    return title.strip() if title else typer.prompt(PROMPT_TITLE)
+
+
+def validate_title(title: str) -> None:
+    """Validate the note title."""
+    if not title:
+        raise ValueError("Note title cannot be empty.")
+    if len(title) > MAX_TITLE_LENGTH:
+        raise ValueError(f"Title cannot be more than {MAX_TITLE_LENGTH} characters.")
+    if title.endswith(".md"):
+        raise ValueError("Leave out the .md extension.")
+
+
+def format_path(note_title: str) -> Path:
+    """Format the absolute path based on Zettelkasten location and the note title."""
+    return INBOX_PATH / f"{note_title}.md"
+
+
+def create_file(file_path: Path, note_title: str) -> None:
+    """Create a new note file and open it in the editor."""
+    if file_path.exists():
+        raise FileExistsError(f"The file already exists: {file_path}")
+    create_note_file(file_path, note_title)
+    print(f"New note created: {file_path}")
+
+
+def create_note_file(file_path: Path, note_title: str) -> None:
+    """
+    Create a new note file with the given title, append the title tot he daily note, and add a H1 Markdown heading.
+    """
+    append_daily_note(note_title)
+    file_path.write_text(f"# {note_title}\n\n")
+
+
+================================================
+File: zettelkasten_cli/periodic_notes.py
+================================================
+import typer
+from rich import print
+import subprocess
+import os
+from zettelkasten_cli.utils import format_date
+from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from datetime import datetime
+from pathlib import Path
+
+app = typer.Typer()
+
+TODAY = format_date()
+YESTERDAY = format_date(-1)
+TOMORROW = format_date(1)
+CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
+DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily-notes"
+DAILY_NOTES_TEMPLATE_PATH = CONFIG_PATH / "zk" / "daily.md"
+TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
+WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly-notes"
+
+
+def format_daily_note_content() -> str:
+    """
+    Creates the daily note template content by reading from the template file.
+    Returns:
+        str: Formatted content for the daily note.
+    """
+    # Add the navigation links at the top
+    content = f"[[{YESTERDAY}]] - [[{TOMORROW}]]\n\n"
+
+    # Read and append the template content if it exists
+    try:
+        if DAILY_NOTES_TEMPLATE_PATH.exists():
+            template_content = DAILY_NOTES_TEMPLATE_PATH.read_text()
+            content += template_content
+        else:
+            print(f"Warning: Template file not found at {DAILY_NOTES_TEMPLATE_PATH}")
+            # Fallback to default template
+            content += """
+## Journal
+
+"""
+    except IOError as e:
+        print(f"Error reading template file: {e}")
+        # Fallback to default template
+        content += """
+## Journal
+"""
+
+    return content
+
+
+def create_daily_note() -> None:
+    """
+    Creates the daily note if it doesn't exist.
+    If the note already exists, it prints a message indicating so.
+    """
+    try:
+        if not TODAY_NOTE_PATH.exists():
+            print(f"Creating new daily note: {TODAY_NOTE_PATH}")
+            TODAY_NOTE_PATH.write_text(format_daily_note_content())
+        else:
+            print(f"Daily note already exists: {TODAY_NOTE_PATH}")
+    except IOError as e:
+        print(f"Error creating daily note: {e}")
+
+
+def append_daily_note(note_title: str) -> None:
+    """
+    Appends given note title to daily note as Obsidian markdown link.
+    Args:
+        note_title (str): The title of the note to be appended.
+    """
+    create_daily_note()
+    try:
+        with TODAY_NOTE_PATH.open(mode="a") as note:
+            note.write(f"\n[[{note_title}]]")
+    except IOError as e:
+        print(f"Error appending to daily note: {e}")
+
+
+def open_daily_note() -> None:
+    """
+    Opens today's daily note in Neovim.
+    Creates the note if it doesn't exist before opening.
+    """
+    # TODO: use the function from utils
+    create_daily_note()
+    try:
+        subprocess.run(
+            ["nvim", "+ normal Gzzo", str(TODAY_NOTE_PATH), "-c", ":NoNeckPain"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error opening daily note in Neovim: {e}")
+
+
+def get_weekly_note_path() -> Path:
+    """
+    Formats the note title.
+    Returns the path to the current week's note.
+    """
+    week_number = datetime.now().strftime("%Y-W%W")
+    return WEEKLY_NOTES_PATH / f"{week_number}.md"
+    # TODO: use the function from utils
+
+
+@app.command()
+def open_weekly_note():
+    """
+    Opens this week's weekly note in Neovim if it exists.
+    If the note doesn't exist, it prints an error message.
+    """
+    weekly_note_path = get_weekly_note_path()
+    if not weekly_note_path.exists():
+        print(
+            "[bold red]Error:[/bold red] Weekly note doesn't exist. Please create it in Obsidian."
+        )
+        return
+    try:
+        subprocess.run(
+            ["nvim", "+ normal Gzzo", str(weekly_note_path), "-c", ":NoNeckPain"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error opening weekly note in Neovim: {e}")
+
+
+================================================
+File: zettelkasten_cli/utils.py
+================================================
+import subprocess
+from rich import print
+from zettelkasten_cli.config import EDITOR_COMMAND
+from datetime import datetime, timedelta
+
+
+def format_date(delta_days=0):
+    return (datetime.now() + timedelta(days=delta_days)).strftime("%Y-%m-%d")
+
+
+def open_in_editor(file_path: str) -> None:
+    """Open the created file in the configured editor."""
+    try:
+        subprocess.run([EDITOR_COMMAND, file_path], check=True)
+    except subprocess.CalledProcessError:
+        print(f"Error: Failed to open the file with {EDITOR_COMMAND}.")
+    except FileNotFoundError:
+        print(
+            f"Error: {EDITOR_COMMAND} command not found. Make sure it's installed and in your PATH."
+        )
+
+
+================================================
+File: .devcontainer/Dockerfile
+================================================
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+
+COPY --from=jdxcode/mise /usr/local/bin/mise /usr/local/bin/
+
+# make sure mise is activated in both zsh and bash. Might be overridden by a user's dotfiles.
+RUN echo 'eval "$(mise activate bash)"' >> /home/vscode/.bashrc && \
+  echo 'eval "$(mise activate zsh)"' >> /home/vscode/.zshrc
+
+
+================================================
+File: .devcontainer/devcontainer.json
+================================================
+{
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "scripts/setup",
+  "remoteEnv": {
+    "REMOTE_CONTAINERS": "true"
+  }
+}
+
+
+================================================
+File: .github/workflows/workflow.yaml
+================================================
+name: Build and publish python package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-service-client-package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish PyPi package
+        uses: cadifyai/poetry-publish@v0.1.0
+        with:
+          PACKAGE_DIRECTORY: "./zettelkasten_cli/"
+          PYTHON_VERSION: "3.12"
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_REGISTRY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+
