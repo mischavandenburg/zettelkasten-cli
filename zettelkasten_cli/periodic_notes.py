@@ -14,6 +14,7 @@ app = typer.Typer()
 TODAY = format_date()
 YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
+THIS_WEEK = format_week()
 LAST_WEEK = format_week(-7)  # Correct this to start on Monday and end Sunday
 NEXT_WEEK = format_week(7)  # Correct this to start on Monday and end Sunday
 CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
@@ -24,6 +25,7 @@ TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
 
 WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "_Weekly"
 WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "Templates" / "weekly.md"
+THIS_WEEK_NOTE_PATH = WEEKLY_NOTES_PATH / f"{THIS_WEEK}.md"
 
 
 def format_daily_note_content() -> str:
@@ -127,27 +129,14 @@ def open_daily_note() -> None:
         print(f"Error opening daily note: {e}")
 
 
-def get_weekly_note_path() -> Path:
-    """
-    Formats the note title.
-    Returns the path to the current week's note.
-    """
-    week_number = datetime.now().strftime("%Y-W%W")
-    return WEEKLY_NOTES_PATH / f"{week_number}.md"
-    # TODO: use the function from utils
-
-
 def create_weekly_note() -> None:
     """
     Creates the weekly note if it doesn't exist.
     """
-    # TODO: use the function from utils
-    weekly_note_path = get_weekly_note_path()
     try:
-        if not weekly_note_path.exists():
+        if not THIS_WEEK_NOTE_PATH.exists():
             print(f"Creating new weekly note: {WEEKLY_NOTES_PATH}")
-            weekly_note_content = format_weekly_note_content()
-            weekly_note_path.write_text(weekly_note_content)
+            THIS_WEEK_NOTE_PATH.write_text(format_weekly_note_content())
         else:
             print(f"Weekly note already exists: {WEEKLY_NOTES_PATH}")
     except IOError as e:
@@ -173,9 +162,8 @@ def open_weekly_note() -> None:
     Opens this week's weekly note in Neovim.
     If the note doesn't exist, it prints an error message.
     """
-    weekly_note_path = get_weekly_note_path()
     create_weekly_note()
     try:
-        open_in_editor(weekly_note_path)
+        open_in_editor(THIS_WEEK_NOTE_PATH)
     except Exception as e:
         print(f"Error opening weekly note: {e}")
