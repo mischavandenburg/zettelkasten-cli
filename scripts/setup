@@ -1,0 +1,3 @@
+#!/bin/bash
+
+# /usr/local/bin/mise trust /workspaces/zettelkasten-cli/mise.toml && /usr/local/bin/mise install

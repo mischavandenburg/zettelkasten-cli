@@ -1,0 +1,10 @@
+{
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "scripts/setup",
+  "remoteEnv": {
+    "REMOTE_CONTAINERS": "true"
+  }
+}
