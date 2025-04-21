@@ -13,9 +13,9 @@ def format_date(delta_days=0):
 
 
 def format_week(delta_days=0):
-    target_date = datetime.now() + timedelta(days=delta_days)
-    year, week, _ = target_date.isocalendar()
-    return f"{year}-W{week:02d}"
+    return (
+        datetime.now() + timedelta(days=delta_days - datetime.now().weekday())
+    ).strftime("%Y-W%V")
 
 
 def open_in_editor(file_path: Union[str, Path]) -> None:
