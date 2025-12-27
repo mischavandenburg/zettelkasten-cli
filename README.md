@@ -137,7 +137,7 @@ zk new [OPTIONS] [TITLE]
 
 **Options**:
 
-- `--vim`: Indicates input is coming from Neovim. Suppresses rich output.
+- `--vim`: Output plain path for Neovim integration (no rich formatting).
 
 ## Development
 
