@@ -1,10 +1,19 @@
 import os
+import sys
 from pathlib import Path
 
 import typer
-from rich import print
+from rich import print as rich_print
 
 from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+
+
+def log(message: str) -> None:
+    """Print message only if stdout is a TTY (not captured by another process)."""
+    if sys.stdout.isatty():
+        rich_print(message)
+
+
 from zettelkasten_cli.utils import format_date, format_week, open_in_editor
 
 app = typer.Typer()
@@ -41,14 +50,14 @@ def format_daily_note_content() -> str:
             template_content = DAILY_NOTES_TEMPLATE_PATH.read_text()
             content += template_content
         else:
-            print(f"Warning: Template file not found at {DAILY_NOTES_TEMPLATE_PATH}")
+            log(f"Warning: Template file not found at {DAILY_NOTES_TEMPLATE_PATH}")
             # Fallback to default template
             content += """
 ## Journal
 
 """
     except IOError as e:
-        print(f"Error reading template file: {e}")
+        log(f"Error reading template file: {e}")
         # Fallback to default template
         content += """
 ## Journal
@@ -71,14 +80,14 @@ def format_weekly_note_content() -> str:
             template_content = WEEKLY_NOTES_TEMPLATE_PATH.read_text()
             content += template_content
         else:
-            print(f"Warning: Template file not found at {WEEKLY_NOTES_TEMPLATE_PATH}")
+            log(f"Warning: Template file not found at {WEEKLY_NOTES_TEMPLATE_PATH}")
             # Fallback to default template
             content += """
 ## Weekly Journal
 
 """
     except IOError as e:
-        print(f"Error reading template file: {e}")
+        log(f"Error reading template file: {e}")
         # Fallback to default template
         content += """
 ### Weekly Journal
@@ -93,12 +102,12 @@ def create_daily_note() -> None:
     """
     try:
         if not TODAY_NOTE_PATH.exists():
-            print(f"Creating new daily note: {TODAY_NOTE_PATH}")
+            log(f"Creating new daily note: {TODAY_NOTE_PATH}")
             TODAY_NOTE_PATH.write_text(format_daily_note_content())
         else:
-            print(f"Daily note already exists: {TODAY_NOTE_PATH}")
+            log(f"Daily note already exists: {TODAY_NOTE_PATH}")
     except IOError as e:
-        print(f"Error creating daily note: {e}")
+        log(f"Error creating daily note: {e}")
 
 
 def append_daily_note(note_title: str) -> None:
@@ -112,7 +121,7 @@ def append_daily_note(note_title: str) -> None:
         with TODAY_NOTE_PATH.open(mode="a") as note:
             note.write(f"\n[[{note_title}]]")
     except IOError as e:
-        print(f"Error appending to daily note: {e}")
+        log(f"Error appending to daily note: {e}")
 
 
 def open_daily_note() -> None:
@@ -124,7 +133,7 @@ def open_daily_note() -> None:
     try:
         open_in_editor(TODAY_NOTE_PATH)
     except Exception as e:
-        print(f"Error opening daily note: {e}")
+        log(f"Error opening daily note: {e}")
 
 
 def create_weekly_note() -> None:
@@ -133,12 +142,12 @@ def create_weekly_note() -> None:
     """
     try:
         if not THIS_WEEK_NOTE_PATH.exists():
-            print(f"Creating new weekly note: {WEEKLY_NOTES_PATH}")
+            log(f"Creating new weekly note: {WEEKLY_NOTES_PATH}")
             THIS_WEEK_NOTE_PATH.write_text(format_weekly_note_content())
         else:
-            print(f"Weekly note already exists: {WEEKLY_NOTES_PATH}")
+            log(f"Weekly note already exists: {WEEKLY_NOTES_PATH}")
     except IOError as e:
-        print(f"Error creating weekly note: {e}")
+        log(f"Error creating weekly note: {e}")
 
 
 def append_weekly_note(note_title: str) -> None:
@@ -152,7 +161,7 @@ def append_weekly_note(note_title: str) -> None:
         with WEEKLY_NOTES_PATH.open(mode="a") as note:
             note.write(f"\n[[{note_title}]]")
     except IOError as e:
-        print(f"Error appending to weekly note: {e}")
+        log(f"Error appending to weekly note: {e}")
 
 
 def open_weekly_note() -> None:
@@ -164,4 +173,4 @@ def open_weekly_note() -> None:
     try:
         open_in_editor(THIS_WEEK_NOTE_PATH)
     except Exception as e:
-        print(f"Error opening weekly note: {e}")
+        log(f"Error opening weekly note: {e}")

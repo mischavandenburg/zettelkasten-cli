@@ -1,5 +1,6 @@
+import sys
 import typer
-from rich import print
+from rich import print as rich_print
 from typing import Optional
 from pathlib import Path
 from zettelkasten_cli.config import MAX_TITLE_LENGTH, INBOX_PATH, PROMPT_TITLE
@@ -17,7 +18,7 @@ def create_new_note(title, vim_mode) -> None:
         note_title = get_note_title(title)
         validate_title(note_title)
         file_path = format_path(note_title)
-        create_file(file_path, note_title)
+        create_file(file_path, note_title, vim_mode)
         if not vim_mode:
             open_in_editor(str(file_path))
     except ValueError as e:
@@ -51,12 +52,16 @@ def format_path(note_title: str) -> Path:
     return INBOX_PATH / f"{note_title}.md"
 
 
-def create_file(file_path: Path, note_title: str) -> None:
+def create_file(file_path: Path, note_title: str, vim_mode: bool = False) -> None:
     """Create a new note file and open it in the editor."""
     if file_path.exists():
         raise FileExistsError(f"The file already exists: {file_path}")
     create_note_file(file_path, note_title)
-    print(f"New note created: {file_path}")
+    # Use plain print for vim_mode to avoid ANSI codes that break Neovim parsing
+    if vim_mode:
+        print(f"New note created: {file_path}", file=sys.stdout, flush=True)
+    else:
+        rich_print(f"New note created: {file_path}")
 
 
 def create_note_file(file_path: Path, note_title: str) -> None:
