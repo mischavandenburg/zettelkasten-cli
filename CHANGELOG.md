@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.3.1...v0.4.0) (2025-12-27)
+
+
+### Features
+
+* add workflow_dispatch for manual PyPI publishes ([db76a41](https://github.com/mischavandenburg/zettelkasten-cli/commit/db76a411cf3eb9be777a97b103fc4e6db06a8a03))
+
+
+### Bug Fixes
+
+* chain publish job directly from release-please ([f8ad766](https://github.com/mischavandenburg/zettelkasten-cli/commit/f8ad766ce09bb42bf23de8f59c31b0461734f478))
+
+
+### Documentation
+
+* expand configuration section with env vars and directory structure ([5377b93](https://github.com/mischavandenburg/zettelkasten-cli/commit/5377b93e94f8b7dbc0e7f424ad823a217f2f686e))
+* update README for uv and release-please ([a0a0d13](https://github.com/mischavandenburg/zettelkasten-cli/commit/a0a0d13537dd1986608075fb30921d5c7e9f44fc))
+
 ## [0.3.1](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.3.0...v0.3.1) (2025-12-27)
 
 
