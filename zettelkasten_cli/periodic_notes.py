@@ -36,19 +36,15 @@ def format_daily_note_content() -> str:
     Returns:
         str: Formatted content for the daily note.
     """
-    # Add navigation links and date header
-    content = f"[[{YESTERDAY}]] - [[{TOMORROW}]]\n\n"
-    content += f"# {TODAY}\n\n"
-
-    # Read and append the template content if it exists
+    # Read template if it exists, otherwise use default
     try:
         if DAILY_NOTES_TEMPLATE_PATH.exists():
-            template_content = DAILY_NOTES_TEMPLATE_PATH.read_text()
-            content += template_content
+            return DAILY_NOTES_TEMPLATE_PATH.read_text()
     except IOError as e:
         log(f"Error reading template file: {e}")
 
-    return content
+    # Default template: just date as H1 header
+    return f"# {TODAY}\n\n"
 
 
 def format_weekly_note_content() -> str:
