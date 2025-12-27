@@ -1,6 +1,6 @@
 [project]
 name = "zettelkasten-cli"
-version = "1.0.0"
+version = "0.5.0"
 description = "A CLI for managing your Neovim + Obsidian Zettelkasten"
 authors = [{ name = "Mischa van den Burg" }]
 readme = "README.md"
