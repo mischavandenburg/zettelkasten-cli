@@ -5,6 +5,20 @@ from pathlib import Path
 ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
 INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
 
+# Periodic notes paths (configurable via environment variables)
+DAILY_NOTES_DIR = os.environ.get("ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily")
+WEEKLY_NOTES_DIR = os.environ.get("ZETTELKASTEN_WEEKLY_DIR", "periodic-notes/weekly")
+
+DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / DAILY_NOTES_DIR
+WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / WEEKLY_NOTES_DIR
+
+# Template paths (configurable via environment variables)
+DAILY_TEMPLATE_PATH = os.environ.get("ZETTELKASTEN_DAILY_TEMPLATE", "zk/daily.md")
+WEEKLY_TEMPLATE_PATH = os.environ.get("ZETTELKASTEN_WEEKLY_TEMPLATE", "zk/weekly.md")
+
+DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / DAILY_TEMPLATE_PATH
+WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / WEEKLY_TEMPLATE_PATH
+
 # File settings
 MAX_TITLE_LENGTH = 80
 

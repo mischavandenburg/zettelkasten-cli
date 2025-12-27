@@ -1,11 +1,14 @@
-import os
 import sys
-from pathlib import Path
 
 import typer
 from rich import print as rich_print
 
-from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from zettelkasten_cli.config import (
+    DAILY_NOTES_PATH,
+    DAILY_NOTES_TEMPLATE_PATH,
+    WEEKLY_NOTES_PATH,
+    WEEKLY_NOTES_TEMPLATE_PATH,
+)
 from zettelkasten_cli.utils import format_date, format_week, open_in_editor
 
 app = typer.Typer()
@@ -20,16 +23,10 @@ TODAY = format_date()
 YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
 THIS_WEEK = format_week()
-LAST_WEEK = format_week(-7)  # Correct this to start on Monday and end Sunday
-NEXT_WEEK = format_week(7)  # Correct this to start on Monday and end Sunday
-CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
+LAST_WEEK = format_week(-7)
+NEXT_WEEK = format_week(7)
 
-DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily"
-DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "daily.md"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
-
-WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly"
-WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "weekly.md"
 THIS_WEEK_NOTE_PATH = WEEKLY_NOTES_PATH / f"{THIS_WEEK}.md"
 
 
