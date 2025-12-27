@@ -1,11 +1,14 @@
-import os
 import sys
-from pathlib import Path
 
 import typer
 from rich import print as rich_print
 
-from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from zettelkasten_cli.config import (
+    DAILY_NOTES_PATH,
+    DAILY_NOTES_TEMPLATE_PATH,
+    WEEKLY_NOTES_PATH,
+    WEEKLY_NOTES_TEMPLATE_PATH,
+)
 from zettelkasten_cli.utils import format_date, format_week, open_in_editor
 
 app = typer.Typer()
@@ -20,16 +23,10 @@ TODAY = format_date()
 YESTERDAY = format_date(-1)
 TOMORROW = format_date(1)
 THIS_WEEK = format_week()
-LAST_WEEK = format_week(-7)  # Correct this to start on Monday and end Sunday
-NEXT_WEEK = format_week(7)  # Correct this to start on Monday and end Sunday
-CONFIG_PATH = Path(os.environ.get("XDG_CONFIG_HOME", ""))
+LAST_WEEK = format_week(-7)
+NEXT_WEEK = format_week(7)
 
-DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "daily"
-DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "daily.md"
 TODAY_NOTE_PATH = DAILY_NOTES_PATH / f"{TODAY}.md"
-
-WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / "periodic-notes" / "weekly"
-WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / "zk" / "weekly.md"
 THIS_WEEK_NOTE_PATH = WEEKLY_NOTES_PATH / f"{THIS_WEEK}.md"
 
 
@@ -39,29 +36,15 @@ def format_daily_note_content() -> str:
     Returns:
         str: Formatted content for the daily note.
     """
-    # Add the navigation links at the top
-    content = f"[[{YESTERDAY}]] - [[{TOMORROW}]]\n\n"
-
-    # Read and append the template content if it exists
+    # Read template if it exists, otherwise use default
     try:
         if DAILY_NOTES_TEMPLATE_PATH.exists():
-            template_content = DAILY_NOTES_TEMPLATE_PATH.read_text()
-            content += template_content
-        else:
-            log(f"Warning: Template file not found at {DAILY_NOTES_TEMPLATE_PATH}")
-            # Fallback to default template
-            content += """
-## Journal
-
-"""
+            return DAILY_NOTES_TEMPLATE_PATH.read_text()
     except IOError as e:
         log(f"Error reading template file: {e}")
-        # Fallback to default template
-        content += """
-## Journal
-"""
 
-    return content
+    # Default template: just date as H1 header
+    return f"# {TODAY}\n\n"
 
 
 def format_weekly_note_content() -> str:
