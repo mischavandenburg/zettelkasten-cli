@@ -3,7 +3,10 @@ from pathlib import Path
 
 # Paths
 ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
-INBOX_PATH = ZETTELKASTEN_ROOT / "0 Inbox"
+
+# Inbox directory (configurable via environment variable)
+INBOX_DIR = os.environ.get("ZETTELKASTEN_INBOX_DIR", "0 Inbox")
+INBOX_PATH = ZETTELKASTEN_ROOT / INBOX_DIR
 
 # Periodic notes paths (configurable via environment variables)
 DAILY_NOTES_DIR = os.environ.get("ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily")
@@ -25,8 +28,8 @@ MAX_TITLE_LENGTH = 80
 # Prompts
 PROMPT_TITLE = "Enter the title of the note"
 
-# Commands
-EDITOR_COMMAND = "nvim"
+# Editor (configurable via environment variable)
+EDITOR_COMMAND = os.environ.get("ZETTELKASTEN_EDITOR", "nvim")
 
 # Only use default arguments if environment variable is not set
 NVIM_ARGS = os.environ.get("ZETTELKASTEN_NVIM_ARGS") or "+ normal Gzzo"

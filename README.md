@@ -32,10 +32,12 @@ uv run zk --help
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `ZETTELKASTEN` | Yes | - | Path to your Zettelkasten root directory |
+| `ZETTELKASTEN_INBOX_DIR` | No | `0 Inbox` | Directory for new notes (relative to root) |
 | `ZETTELKASTEN_DAILY_DIR` | No | `periodic-notes/daily` | Directory for daily notes (relative to root) |
 | `ZETTELKASTEN_WEEKLY_DIR` | No | `periodic-notes/weekly` | Directory for weekly notes (relative to root) |
 | `ZETTELKASTEN_DAILY_TEMPLATE` | No | `zk/daily.md` | Path to daily note template (relative to root) |
 | `ZETTELKASTEN_WEEKLY_TEMPLATE` | No | `zk/weekly.md` | Path to weekly note template (relative to root) |
+| `ZETTELKASTEN_EDITOR` | No | `nvim` | Editor command (nvim, vim, hx, code, etc.) |
 | `ZETTELKASTEN_NVIM_ARGS` | No | `+ normal Gzzo` | Arguments passed to Neovim when opening notes |
 | `ZETTELKASTEN_NVIM_COMMANDS` | No | `:NoNeckPain` | Comma-separated Neovim commands to run on open |
 
@@ -43,6 +45,9 @@ Add to your shell profile (e.g., `~/.bashrc` or `~/.zshrc`):
 
 ```bash
 export ZETTELKASTEN="$HOME/Documents/Zettelkasten"
+
+# Optional: customize inbox directory
+export ZETTELKASTEN_INBOX_DIR="Inbox"
 
 # Optional: customize periodic notes directories
 export ZETTELKASTEN_DAILY_DIR="daily-notes"
@@ -52,7 +57,10 @@ export ZETTELKASTEN_WEEKLY_DIR="weekly-notes"
 export ZETTELKASTEN_DAILY_TEMPLATE="templates/daily.md"
 export ZETTELKASTEN_WEEKLY_TEMPLATE="templates/weekly.md"
 
-# Optional: customize Neovim behavior
+# Optional: use a different editor
+export ZETTELKASTEN_EDITOR="hx"  # or vim, code, etc.
+
+# Optional: customize Neovim behavior (only applies when using nvim)
 export ZETTELKASTEN_NVIM_ARGS="+ normal Gzzo"
 export ZETTELKASTEN_NVIM_COMMANDS=":NoNeckPain,:set wrap"
 ```
