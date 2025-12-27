@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.4.0...v0.5.0) (2025-12-27)
+
+
+### Features
+
+* add date as H1 header in daily notes ([bd43c0b](https://github.com/mischavandenburg/zettelkasten-cli/commit/bd43c0b7842a532195594ec850f1eba079e38206))
+* make periodic notes directories configurable ([4fc354c](https://github.com/mischavandenburg/zettelkasten-cli/commit/4fc354c79d3f012aed4879c7047bac571e8f1382))
+
+
+### Bug Fixes
+
+* simplify daily note default to just date header ([cc1a80a](https://github.com/mischavandenburg/zettelkasten-cli/commit/cc1a80a3dd046c8d965af9b9da79f9ad464e2114))
+* update default periodic notes paths to match actual structure ([d885084](https://github.com/mischavandenburg/zettelkasten-cli/commit/d88508439713153007a5532f91fd1fb5234d0746))
+
 ## [0.4.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.3.1...v0.4.0) (2025-12-27)
 
 
