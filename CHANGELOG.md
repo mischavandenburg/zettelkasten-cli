@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.3.0...v0.3.1) (2025-12-27)
+
+
+### Bug Fixes
+
+* trigger publish on release event instead of tag push ([79b6d0a](https://github.com/mischavandenburg/zettelkasten-cli/commit/79b6d0ad8e66f8c9f1ad8d28ff81d6e31b2d3b76))
+
 ## [0.3.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/0.2.0...v0.3.0) (2025-12-27)
 
 
