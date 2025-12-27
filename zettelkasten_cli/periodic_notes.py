@@ -6,17 +6,15 @@ import typer
 from rich import print as rich_print
 
 from zettelkasten_cli.config import ZETTELKASTEN_ROOT
+from zettelkasten_cli.utils import format_date, format_week, open_in_editor
+
+app = typer.Typer()
 
 
 def log(message: str) -> None:
     """Print message only if stdout is a TTY (not captured by another process)."""
     if sys.stdout.isatty():
         rich_print(message)
-
-
-from zettelkasten_cli.utils import format_date, format_week, open_in_editor
-
-app = typer.Typer()
 
 TODAY = format_date()
 YESTERDAY = format_date(-1)
