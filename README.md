@@ -27,15 +27,42 @@ uv run zk --help
 
 ## Configuration
 
-Set the `ZETTELKASTEN` environment variable to your Zettelkasten root directory:
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `ZETTELKASTEN` | Yes | - | Path to your Zettelkasten root directory |
+| `ZETTELKASTEN_NVIM_ARGS` | No | `+ normal Gzzo` | Arguments passed to Neovim when opening notes |
+| `ZETTELKASTEN_NVIM_COMMANDS` | No | `:NoNeckPain` | Comma-separated Neovim commands to run on open |
+
+Add to your shell profile (e.g., `~/.bashrc` or `~/.zshrc`):
 
 ```bash
-export ZETTELKASTEN=<path to directory>
+export ZETTELKASTEN="$HOME/Documents/Zettelkasten"
+
+# Optional: customize Neovim behavior
+export ZETTELKASTEN_NVIM_ARGS="+ normal Gzzo"
+export ZETTELKASTEN_NVIM_COMMANDS=":NoNeckPain,:set wrap"
 ```
 
-Optional environment variables:
-- `ZETTELKASTEN_NVIM_ARGS` - Custom Neovim arguments
-- `ZETTELKASTEN_NVIM_COMMANDS` - Custom Neovim commands to run on open
+### Expected Directory Structure
+
+The CLI expects the following structure within your `ZETTELKASTEN` directory:
+
+```
+$ZETTELKASTEN/
+├── 0 Inbox/              # New notes are created here
+├── periodic-notes/
+│   ├── daily/            # Daily notes (YYYY-MM-DD.md)
+│   └── weekly/           # Weekly notes (YYYY-Www.md)
+└── zk/
+    ├── daily.md          # Template for daily notes
+    └── weekly.md         # Template for weekly notes
+```
+
+### Templates
+
+Daily and weekly note templates are read from the `zk/` directory. If templates don't exist, minimal defaults are used.
 
 ## Usage
 
