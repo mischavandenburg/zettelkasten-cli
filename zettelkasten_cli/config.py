@@ -1,39 +1,142 @@
+"""Configuration management using dataclasses."""
+
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
 
-# Paths
-ZETTELKASTEN_ROOT = Path(os.environ.get("ZETTELKASTEN", ""))
+from zettelkasten_cli.exceptions import ConfigurationError
 
-# Inbox directory (configurable via environment variable)
-INBOX_DIR = os.environ.get("ZETTELKASTEN_INBOX_DIR", "0 Inbox")
-INBOX_PATH = ZETTELKASTEN_ROOT / INBOX_DIR
 
-# Periodic notes paths (configurable via environment variables)
-DAILY_NOTES_DIR = os.environ.get("ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily-notes")
-WEEKLY_NOTES_DIR = os.environ.get("ZETTELKASTEN_WEEKLY_DIR", "periodic-notes/weekly-notes")
+def _get_env(key: str, default: str | None = None) -> str | None:
+    """Get environment variable value."""
+    return os.environ.get(key, default)
 
-DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / DAILY_NOTES_DIR
-WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / WEEKLY_NOTES_DIR
 
-# Template paths (configurable via environment variables)
-DAILY_TEMPLATE_PATH = os.environ.get("ZETTELKASTEN_DAILY_TEMPLATE", "zk/daily.md")
-WEEKLY_TEMPLATE_PATH = os.environ.get("ZETTELKASTEN_WEEKLY_TEMPLATE", "zk/weekly.md")
+def _get_env_required(key: str) -> str:
+    """Get required environment variable, raise if missing."""
+    value = os.environ.get(key)
+    if not value:
+        raise ConfigurationError(
+            f"Environment variable {key} is required. "
+            f"Set it to your Zettelkasten root directory."
+        )
+    return value
 
-DAILY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / DAILY_TEMPLATE_PATH
-WEEKLY_NOTES_TEMPLATE_PATH = ZETTELKASTEN_ROOT / WEEKLY_TEMPLATE_PATH
 
-# File settings
-MAX_TITLE_LENGTH = 80
+@dataclass(frozen=True)
+class EditorConfig:
+    """Editor configuration."""
 
-# Prompts
-PROMPT_TITLE = "Enter the title of the note"
+    command: str = field(
+        default_factory=lambda: _get_env("ZETTELKASTEN_EDITOR", "nvim") or "nvim"
+    )
+    nvim_args: str = field(
+        default_factory=lambda: _get_env("ZETTELKASTEN_NVIM_ARGS", "+ normal Gzzo")
+        or "+ normal Gzzo"
+    )
+    nvim_commands: list[str] = field(default_factory=lambda: _parse_nvim_commands())
 
-# Editor (configurable via environment variable)
-EDITOR_COMMAND = os.environ.get("ZETTELKASTEN_EDITOR", "nvim")
+    @property
+    def is_nvim(self) -> bool:
+        """Check if using neovim."""
+        return self.command in ("nvim", "neovim")
 
-# Only use default arguments if environment variable is not set
-NVIM_ARGS = os.environ.get("ZETTELKASTEN_NVIM_ARGS") or "+ normal Gzzo"
 
-# Only use default commands if environment variable is not set
-nvim_cmds = os.environ.get("ZETTELKASTEN_NVIM_COMMANDS")
-NVIM_COMMANDS = nvim_cmds.split(",") if nvim_cmds else [":NoNeckPain"]
+def _parse_nvim_commands() -> list[str]:
+    """Parse comma-separated nvim commands from env."""
+    raw = _get_env("ZETTELKASTEN_NVIM_COMMANDS")
+    if raw:
+        return [cmd.strip() for cmd in raw.split(",") if cmd.strip()]
+    return [":NoNeckPain"]
+
+
+@dataclass(frozen=True)
+class PathConfig:
+    """Path configuration for the Zettelkasten."""
+
+    root: Path
+    inbox_dir: str = field(
+        default_factory=lambda: _get_env("ZETTELKASTEN_INBOX_DIR", "0 Inbox")
+        or "0 Inbox"
+    )
+    daily_dir: str = field(
+        default_factory=lambda: _get_env(
+            "ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily-notes"
+        )
+        or "periodic-notes/daily-notes"
+    )
+    weekly_dir: str = field(
+        default_factory=lambda: _get_env(
+            "ZETTELKASTEN_WEEKLY_DIR", "periodic-notes/weekly-notes"
+        )
+        or "periodic-notes/weekly-notes"
+    )
+    daily_template: str = field(
+        default_factory=lambda: _get_env("ZETTELKASTEN_DAILY_TEMPLATE", "zk/daily.md")
+        or "zk/daily.md"
+    )
+    weekly_template: str = field(
+        default_factory=lambda: _get_env("ZETTELKASTEN_WEEKLY_TEMPLATE", "zk/weekly.md")
+        or "zk/weekly.md"
+    )
+
+    @property
+    def inbox(self) -> Path:
+        """Full path to inbox directory."""
+        return self.root / self.inbox_dir
+
+    @property
+    def daily_notes(self) -> Path:
+        """Full path to daily notes directory."""
+        return self.root / self.daily_dir
+
+    @property
+    def weekly_notes(self) -> Path:
+        """Full path to weekly notes directory."""
+        return self.root / self.weekly_dir
+
+    @property
+    def daily_template_path(self) -> Path:
+        """Full path to daily template."""
+        return self.root / self.daily_template
+
+    @property
+    def weekly_template_path(self) -> Path:
+        """Full path to weekly template."""
+        return self.root / self.weekly_template
+
+
+@dataclass(frozen=True)
+class Config:
+    """Main configuration container."""
+
+    paths: PathConfig
+    editor: EditorConfig
+
+    @classmethod
+    def load(cls) -> "Config":
+        """Load configuration from environment variables."""
+        root_str = _get_env_required("ZETTELKASTEN")
+        root = Path(root_str).expanduser().resolve()
+
+        if not root.exists():
+            raise ConfigurationError(
+                f"Zettelkasten root directory does not exist: {root}"
+            )
+
+        return cls(
+            paths=PathConfig(root=root),
+            editor=EditorConfig(),
+        )
+
+
+# Lazy-loaded singleton
+_config: Config | None = None
+
+
+def get_config() -> Config:
+    """Get the configuration singleton (lazy-loaded)."""
+    global _config
+    if _config is None:
+        _config = Config.load()
+    return _config

@@ -1,7 +1,7 @@
 [project]
 name = "zettelkasten-cli"
-version = "0.5.0"
-description = "CLI to merge Vim and Obsidian Zettelkasten"
+version = "1.0.0"
+description = "A CLI for managing your Neovim + Obsidian Zettelkasten"
 authors = [{ name = "Mischa van den Burg" }]
 readme = "README.md"
 requires-python = ">=3.14"
