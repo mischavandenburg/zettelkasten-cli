@@ -9,8 +9,8 @@ INBOX_DIR = os.environ.get("ZETTELKASTEN_INBOX_DIR", "0 Inbox")
 INBOX_PATH = ZETTELKASTEN_ROOT / INBOX_DIR
 
 # Periodic notes paths (configurable via environment variables)
-DAILY_NOTES_DIR = os.environ.get("ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily")
-WEEKLY_NOTES_DIR = os.environ.get("ZETTELKASTEN_WEEKLY_DIR", "periodic-notes/weekly")
+DAILY_NOTES_DIR = os.environ.get("ZETTELKASTEN_DAILY_DIR", "periodic-notes/daily-notes")
+WEEKLY_NOTES_DIR = os.environ.get("ZETTELKASTEN_WEEKLY_DIR", "periodic-notes/weekly-notes")
 
 DAILY_NOTES_PATH = ZETTELKASTEN_ROOT / DAILY_NOTES_DIR
 WEEKLY_NOTES_PATH = ZETTELKASTEN_ROOT / WEEKLY_NOTES_DIR
