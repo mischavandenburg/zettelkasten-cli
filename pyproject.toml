@@ -1,6 +1,6 @@
 [project]
 name = "zettelkasten-cli"
-version = "0.2.0"
+version = "0.3.0"
 description = "CLI to merge Vim and Obsidian Zettelkasten"
 authors = [{ name = "Mischa van den Burg" }]
 readme = "README.md"
