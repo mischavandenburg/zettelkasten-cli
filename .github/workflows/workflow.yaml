@@ -5,8 +5,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  release:
-    types: [published]
 
 jobs:
   test:
@@ -28,26 +26,3 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'release'
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
-      - name: Set up Python
-        run: uv python install 3.14
-
-      - name: Build package
-        run: uv build
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_TOKEN }}
