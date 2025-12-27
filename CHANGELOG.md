@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.5.0...v1.0.0) (2025-12-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* Complete codebase rewrite following Clean Code principles.
+
+### Features
+
+* complete rewrite with clean architecture ([1c30a47](https://github.com/mischavandenburg/zettelkasten-cli/commit/1c30a4705872c6a5b72f8f95c9d7684e36f2f11d))
+
+
+### Bug Fixes
+
+* let release-please handle version bump ([2c4e54d](https://github.com/mischavandenburg/zettelkasten-cli/commit/2c4e54dcffb30224fd5728e103639cf87f2522b5))
+
 ## [0.5.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.4.0...v0.5.0) (2025-12-27)
 
 
