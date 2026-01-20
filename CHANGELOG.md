@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/mischavandenburg/zettelkasten-cli/compare/v1.0.1...v1.0.2) (2026-01-20)
+
+
+### Bug Fixes
+
+* update test ([4e0bc61](https://github.com/mischavandenburg/zettelkasten-cli/commit/4e0bc61f9c21033ae71305ac0415be737d3e6e20))
+
 ## [1.0.1](https://github.com/mischavandenburg/zettelkasten-cli/compare/v1.0.0...v1.0.1) (2026-01-20)
 
 
