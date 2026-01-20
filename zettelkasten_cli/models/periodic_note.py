@@ -89,10 +89,9 @@ class PeriodicNote:
 
     def get_default_content(self) -> str:
         """Get the default content for a new note."""
-        date_str = self.get_current_date_str()
         yesterday = self.get_offset_date_str(-1)
         tomorrow = self.get_offset_date_str(1)
-        return f"# [[{yesterday}]] - [[{tomorrow}]]\n\n# {date_str}\n\n"
+        return f"# [[{yesterday}]] - [[{tomorrow}]]\n\n"
 
     def get_content(self) -> str:
         """Get the content for a new note (template or default)."""
