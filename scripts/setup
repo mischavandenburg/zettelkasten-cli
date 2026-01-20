@@ -1,3 +1,5 @@
 #!/bin/bash
 
-# /usr/local/bin/mise trust /workspaces/zettelkasten-cli/mise.toml && /usr/local/bin/mise install
+/usr/local/bin/mise trust /workspaces/zettelkasten-cli/mise.toml && /usr/local/bin/mise install
+
+curl -fsSL https://claude.ai/install.sh | bash
