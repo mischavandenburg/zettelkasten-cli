@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/mischavandenburg/zettelkasten-cli/compare/v1.0.2...v1.0.3) (2026-01-20)
+
+
+### Bug Fixes
+
+* double date was added ([50147e1](https://github.com/mischavandenburg/zettelkasten-cli/commit/50147e1771666f7a687af30046f7e84348a68605))
+
 ## [1.0.2](https://github.com/mischavandenburg/zettelkasten-cli/compare/v1.0.1...v1.0.2) (2026-01-20)
 
 
