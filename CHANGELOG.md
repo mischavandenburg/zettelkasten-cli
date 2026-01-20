@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/mischavandenburg/zettelkasten-cli/compare/v1.0.0...v1.0.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* update daily note template default ([aa0ab38](https://github.com/mischavandenburg/zettelkasten-cli/commit/aa0ab38ba91b4f06ba076c52586601c20d3c98f2))
+
 ## [1.0.0](https://github.com/mischavandenburg/zettelkasten-cli/compare/v0.5.0...v1.0.0) (2025-12-27)
 
 
